@@ -25,6 +25,9 @@ class MainActivity : AppCompatActivity() {
         binding.tvMonth.text = currentMonthText
     }
 
+    private var isScrollVertical = false
+    private var isScrollHorizontal = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -40,20 +43,36 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun makeCalendarRecyclerView() {
-        val linearLayoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        val linearLayoutManager = object :
+            LinearLayoutManager(this, HORIZONTAL, false) {
+            override fun canScrollHorizontally(): Boolean {
+                return isScrollHorizontal
+            }
+
+            override fun canScrollVertically(): Boolean {
+                return isScrollVertical
+            }
+        }
+
         binding.rvCalendar.layoutManager = linearLayoutManager
         binding.rvCalendar.setHasFixedSize(true)
 
 //        val customGestureDetector = CalendarSnapHelper()
 //        customGestureDetector.attachToRecyclerView(binding.rvCalendar)
 
-        val calendarGesture = CalendarGestureDetector(binding.rvCalendar)
-        val gestureDetector = GestureDetector(this, calendarGesture)
+        val calendarGesture = CalendarGestureDetector(
+            binding.rvCalendar,
+            onVerticalScrolled = {
+                isScrollVertical = it
+            },
+            onHorizontalScrolled = {
+                isScrollHorizontal = it
+            }
+        )
         calendarGesture.attachToRecyclerView()
 
         binding.rvCalendar.setOnTouchListener { v, event ->
-            gestureDetector.onTouchEvent(event)
+            calendarGesture.onTouch(v, event)
             calendarGesture.handleTouchEvent(event)
 
             false
@@ -82,39 +101,6 @@ class MainActivity : AppCompatActivity() {
 
             }
         })
-
-//        binding.motionCalendar.addTransitionListener(object : MotionLayout.TransitionListener {
-//            override fun onTransitionStarted(
-//                motionLayout: MotionLayout?,
-//                startId: Int,
-//                endId: Int
-//            ) {
-//
-//            }
-//
-//            override fun onTransitionChange(
-//                motionLayout: MotionLayout?,
-//                startId: Int,
-//                endId: Int,
-//                progress: Float
-//            ) {
-//                Log.e(TAG, "onTransitionChange: startId $startId, endId $endId progress $progress")
-//            }
-//
-//            override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
-//
-//            }
-//
-//            override fun onTransitionTrigger(
-//                motionLayout: MotionLayout?,
-//                triggerId: Int,
-//                positive: Boolean,
-//                progress: Float
-//            ) {
-//
-//            }
-//
-//        })
     }
 
     private fun initCalendarList(): List<Calendar> {

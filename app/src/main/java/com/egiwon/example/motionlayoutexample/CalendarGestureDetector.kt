@@ -1,7 +1,6 @@
 package com.egiwon.example.motionlayoutexample
 
 import android.animation.ValueAnimator
-import android.content.Context
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.GestureDetector
@@ -17,8 +16,11 @@ import kotlin.math.max
 
 class CalendarGestureDetector(
     private val recyclerView: RecyclerView,
-) : SimpleOnGestureListener() {
+    private val onVerticalScrolled: (Boolean) -> Unit,
+    private val onHorizontalScrolled: (Boolean) -> Unit
+) : SimpleOnGestureListener(), OnTouchListener {
 
+    private val gestureDetector = GestureDetector(recyclerView.context, this)
     private var initialRecyclerViewHeight: Int = 0
     private val maxHeight = recyclerView.context.resources.displayMetrics.heightPixels
     private val minimumHeight = maxHeight / 2
@@ -29,9 +31,22 @@ class CalendarGestureDetector(
     private var initialX = 0f
     private var initialY = 0f
 
+    private var isScrolled = false
+
     private var isVerticalAnimating: Boolean = false
 
     private var horizontalHelper: OrientationHelper? = null
+    override fun onTouch(v: View?, event: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(event)
+
+        if (isScrolled) {
+            recyclerView.stopNestedScroll()
+            recyclerView.stopScroll()
+            return false
+        }
+
+        return false
+    }
 
     override fun onSingleTapUp(e: MotionEvent): Boolean {
         recyclerView.performClick()
@@ -49,7 +64,9 @@ class CalendarGestureDetector(
         initialX = e.x
         initialY = e.y
         isScrollingVertically = false
+        onVerticalScrolled(false)
         isScrollingHorizontally = false
+        onHorizontalScrolled(false)
         return true
     }
 
@@ -64,22 +81,19 @@ class CalendarGestureDetector(
             val deltaY = abs(e2.y - initialY)
             if (deltaX > deltaY) {
                 isScrollingHorizontally = true
+                onHorizontalScrolled(true)
             } else {
                 isScrollingVertically = true
+                onVerticalScrolled(true)
             }
         }
 
         if (isScrollingHorizontally) {
             Log.e(TAG, "onScroll: horizontal Scroll")
-            isScrollingHorizontally = false
-            recyclerView.requestDisallowInterceptTouchEvent(true)
-            recyclerView.suppressLayout(false)
             return false
         }
 
         isVerticalAnimating = true
-        recyclerView.requestDisallowInterceptTouchEvent(false)
-        recyclerView.suppressLayout(true)
 
         if (distanceY > 0) { // 위 방향으로 스크롤
             isUpDrag = false
@@ -95,7 +109,7 @@ class CalendarGestureDetector(
         recyclerView.layoutParams = layoutParams
         Log.e(TAG, "onScroll: newHeight $newHeight params.height ${layoutParams.height}")
 
-        return true
+        return false
     }
 
     override fun onFling(
@@ -133,8 +147,6 @@ class CalendarGestureDetector(
                 }
                 animator.duration = 300
                 animator.start()
-                isScrollingVertically = false
-                recyclerView.suppressLayout(false)
             }
         }
     }
@@ -314,9 +326,9 @@ class CalendarGestureDetector(
         }
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                isScrolled = newState != RecyclerView.SCROLL_STATE_IDLE
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     isVerticalAnimating = false
-                    recyclerView.suppressLayout(false)
                     snapToTargetExistingView()
                 }
             }
