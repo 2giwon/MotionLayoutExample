@@ -3,6 +3,7 @@ package com.egiwon.example.motionlayoutexample
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
+import android.view.MotionEvent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.motion.widget.MotionLayout
@@ -44,15 +45,17 @@ class MainActivity : AppCompatActivity() {
         binding.rvCalendar.layoutManager = linearLayoutManager
         binding.rvCalendar.setHasFixedSize(true)
 
-        val customGestureDetector = CalendarSnapHelper()
-        customGestureDetector.attachToRecyclerView(binding.rvCalendar)
+//        val customGestureDetector = CalendarSnapHelper()
+//        customGestureDetector.attachToRecyclerView(binding.rvCalendar)
 
-        val calendarGesture = CalendarGestureDetector(this, binding.rvCalendar)
+        val calendarGesture = CalendarGestureDetector(binding.rvCalendar)
         val gestureDetector = GestureDetector(this, calendarGesture)
+        calendarGesture.attachToRecyclerView()
 
-        binding.rvCalendar.setOnTouchListener { _, event ->
+        binding.rvCalendar.setOnTouchListener { v, event ->
             gestureDetector.onTouchEvent(event)
             calendarGesture.handleTouchEvent(event)
+
             false
         }
 //        val pagerSnapHelper = PagerSnapHelper()
@@ -80,38 +83,38 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        binding.motionCalendar.addTransitionListener(object : MotionLayout.TransitionListener {
-            override fun onTransitionStarted(
-                motionLayout: MotionLayout?,
-                startId: Int,
-                endId: Int
-            ) {
-
-            }
-
-            override fun onTransitionChange(
-                motionLayout: MotionLayout?,
-                startId: Int,
-                endId: Int,
-                progress: Float
-            ) {
-                Log.e(TAG, "onTransitionChange: startId $startId, endId $endId progress $progress")
-            }
-
-            override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
-
-            }
-
-            override fun onTransitionTrigger(
-                motionLayout: MotionLayout?,
-                triggerId: Int,
-                positive: Boolean,
-                progress: Float
-            ) {
-
-            }
-
-        })
+//        binding.motionCalendar.addTransitionListener(object : MotionLayout.TransitionListener {
+//            override fun onTransitionStarted(
+//                motionLayout: MotionLayout?,
+//                startId: Int,
+//                endId: Int
+//            ) {
+//
+//            }
+//
+//            override fun onTransitionChange(
+//                motionLayout: MotionLayout?,
+//                startId: Int,
+//                endId: Int,
+//                progress: Float
+//            ) {
+//                Log.e(TAG, "onTransitionChange: startId $startId, endId $endId progress $progress")
+//            }
+//
+//            override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
+//
+//            }
+//
+//            override fun onTransitionTrigger(
+//                motionLayout: MotionLayout?,
+//                triggerId: Int,
+//                positive: Boolean,
+//                progress: Float
+//            ) {
+//
+//            }
+//
+//        })
     }
 
     private fun initCalendarList(): List<Calendar> {

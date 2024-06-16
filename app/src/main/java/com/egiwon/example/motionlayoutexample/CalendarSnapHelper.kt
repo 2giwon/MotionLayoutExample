@@ -20,17 +20,17 @@ class CalendarSnapHelper : RecyclerView.OnFlingListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                if (scrolled) {
-                    scrolled = false
-                    snapToTargetExistingView()
-                }
+//                if (scrolled) {
+//                    scrolled = false
+//                    snapToTargetExistingView()
+//                }
             }
         }
 
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            if (dx != 0 || dy != 0) {
-                scrolled = true
-            }
+//            if (dx != 0 || dy != 0) {
+//                scrolled = true
+//            }
         }
     }
 
@@ -52,7 +52,7 @@ class CalendarSnapHelper : RecyclerView.OnFlingListener() {
         this.recyclerView = recyclerView
         if (recyclerView != null) {
             setupCallbacks()
-            snapToTargetExistingView()
+//            snapToTargetExistingView()
         }
     }
 
@@ -61,7 +61,7 @@ class CalendarSnapHelper : RecyclerView.OnFlingListener() {
             return
         }
 
-        recyclerView?.addOnScrollListener(scrollListener)
+//        recyclerView?.addOnScrollListener(scrollListener)
         recyclerView?.onFlingListener = this
     }
 
@@ -186,7 +186,11 @@ class CalendarSnapHelper : RecyclerView.OnFlingListener() {
         }
     }
 
-    private fun findTargetSnapPosition(layoutManager: LayoutManager, velocityX: Int, velocityY: Int): Int {
+    private fun findTargetSnapPosition(
+        layoutManager: LayoutManager,
+        velocityX: Int,
+        velocityY: Int
+    ): Int {
         val itemCount = layoutManager.itemCount
         if (itemCount == 0) {
             return RecyclerView.NO_POSITION
